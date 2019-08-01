@@ -4,8 +4,8 @@ exercise for proxy for redis
 For simplicity we only work with the Redis Commands `GET` and `SET`, which deals only with string keys and values. A further enhancement would allow arbitrary data structures as values and access of those values.
 ## HTTP Interface
 ```
-GET /key/:id # gets contents of key :id
-PUT /key/:id # sets contents of key :id with value the entire request body
+GET /key/:id # gets contents of key :id and returns JSON {"key":..., "value":...} or 404
+PUT /key/:id # sets contents of key :id with value the string at key "value" in the JSON request body and returns JSON {"key":..., "value":...} or 404
 ```
 
 ## Cache
@@ -25,6 +25,6 @@ Scalatest
 scala container
 
 ## Omitted Requirements
-# Redis Client Protocol
+### Redis Client Protocol
 Would take too much time to look up how to configure non-HTTP Requests in Scalatra.
 
