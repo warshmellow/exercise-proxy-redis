@@ -43,7 +43,7 @@ class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String,
     val key = params("id")
     val pair: Pair = parsedBody.extract[Pair]
     logger.error(s"Request body from curl: $pair")
-    redisClient.set(key, pair.value.toString)
+    redisClient.set(key, pair.value)
     Ok(pair.copy(key = Some(key)))
   }
 }
