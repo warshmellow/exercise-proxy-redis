@@ -9,6 +9,7 @@ import org.scalatra.test.scalatest._
 import com.example.app.MyScalatraServlet._
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
+import org.json4s.jackson.Serialization.{read, write}
 
 class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
   protected implicit lazy val jsonFormats: Formats = DefaultFormats
@@ -49,6 +50,18 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
     get(s"/keys/$invalidKey") {
       assertResult(404)(status)
       assert(body.isBlank)
+    }
+  }
+
+  test("PUT /key/:id on MyScalatraServlet should return status 200 if key is set") {
+    val validKey = "validKey"
+    val validValue = "validValue"
+    (redisMock.set _).expects(validKey, validValue)
+    val json = write(Pair(None, validValue))
+
+    put(uri = s"/keys/$validKey", body = json.getBytes()) {
+      assertResult(200)(status)
+      assertResult(Pair(Some(validKey), validValue))(parse(body).extract[Pair])
     }
   }
 }
