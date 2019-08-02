@@ -22,6 +22,6 @@ class ScalatraBootstrap extends LifeCycle {
           }
         })
     
-    context.mount(new MyScalatraServlet(r, cache), "/*")
+    context.mount(new MyScalatraServlet(new RedisClientAsGetAndSettable(r), cache), "/*")
   }
 }

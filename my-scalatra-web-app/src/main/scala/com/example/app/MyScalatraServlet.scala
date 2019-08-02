@@ -17,7 +17,7 @@ import org.json4s.{DefaultFormats, Formats}
 // JSON handling support from Scalatra
 import org.scalatra.json._
 
-class MyScalatraServlet(redisClient: RedisClient, cache: LoadingCache[String, String]) extends ScalatraServlet with JacksonJsonSupport {
+class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String, String]) extends ScalatraServlet with JacksonJsonSupport {
   protected implicit lazy val jsonFormats: Formats = DefaultFormats
 
   private val logger = LoggerFactory.getLogger(getClass)
