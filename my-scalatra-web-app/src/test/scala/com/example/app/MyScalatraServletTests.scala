@@ -84,4 +84,26 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
       assertResult(Pair(Some(validKey), invalidValue.toString))(parse(body).extract[Pair])
     }
   }
+
+  test("LRU eviction") {
+    val validKey1 = "validKey1"
+    val validValue1 = "validValue1"
+    val validKey2 = "validKey2"
+    val validValue2 = "validValue2"
+    (redisMock.set _).expects(*, *).repeat(2)
+    val json1 = write(Pair(None, validValue1))
+    val json2 = write(Pair(None, validValue2))
+
+    put(uri = s"/keys/$validKey1", body = json1.getBytes()) {
+      assertResult(200)(status)
+      assertResult(Pair(Some(validKey1), validValue1))(parse(body).extract[Pair])
+    }
+
+    put(uri = s"/keys/$validKey2", body = json2.getBytes()) {
+      assertResult(200)(status)
+      assertResult(Pair(Some(validKey2), validValue2))(parse(body).extract[Pair])
+    }
+
+    assertResult(null)(cache.getIfPresent(validKey1))
+  }
 }
