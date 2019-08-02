@@ -37,7 +37,7 @@ class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String,
 
   get("/keys/:id") {
     new AsyncResult {
-      val key = params("id")
+      val key: String = params("id")
       val is =
         Future {
           Try(cache.get(key)) match {
@@ -54,7 +54,7 @@ class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String,
 
   put("/keys/:id") {
     new AsyncResult {
-      val key = params("id")
+      val key: String = params("id")
       val pair: Pair = parsedBody.extract[Pair]
       logger.debug(s"Request body from curl: $pair")
       val is = Future {
