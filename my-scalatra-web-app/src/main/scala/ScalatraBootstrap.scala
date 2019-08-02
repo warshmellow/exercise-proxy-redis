@@ -5,13 +5,20 @@ import com.google.common.cache.{CacheBuilder, CacheLoader}
 import org.scalatra._
 import javax.servlet.ServletContext
 import com.redis._
+import com.typesafe.config.ConfigFactory
 
 class ScalatraBootstrap extends LifeCycle {
   override def init(context: ServletContext) {
-    val r = new RedisClient("localhost", 7777)
+    val conf = ConfigFactory.load
+    val redisHost = conf.getString("redisHost")
+    val redisPort = conf.getInt("redisPort")
+    val cacheExpiryTimeSeconds = conf.getLong("cacheExpiryTimeSeconds")
+    val cacheCapacity = conf.getLong("cacheCapacity")
+
+    val r = new RedisClient(redisHost, redisPort)
     val cache = CacheBuilder.newBuilder()
-      .maximumSize(1000)
-      .expireAfterWrite(1, TimeUnit.SECONDS)
+      .maximumSize(cacheCapacity)
+      .expireAfterWrite(cacheExpiryTimeSeconds, TimeUnit.SECONDS)
       .build[String, String](
         new CacheLoader[String, String]() {
           def load(key: String): String = {

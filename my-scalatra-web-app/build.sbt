@@ -24,7 +24,8 @@ libraryDependencies ++= Seq(
   "org.scalatra" %% "scalatra-json" % ScalatraVersion,
   "org.json4s"   %% "json4s-jackson" % "3.5.2",
   "com.typesafe.akka" %% "akka-actor" % "2.5.3",
-  "net.databinder.dispatch" %% "dispatch-core" % "0.13.1"
+  "net.databinder.dispatch" %% "dispatch-core" % "0.13.1",
+  "com.typesafe" % "config" % "1.3.4"
 )
 
 enablePlugins(SbtTwirl)

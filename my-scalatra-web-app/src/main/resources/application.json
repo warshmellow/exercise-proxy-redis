@@ -1,0 +1,7 @@
+{
+  "redisHost": "localhost",
+  "redisPort": 7777,
+  "cacheExpiryTimeSeconds": 1000,
+  "cacheCapacity": 1000,
+  "port": 8080
+}
