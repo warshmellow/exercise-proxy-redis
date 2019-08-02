@@ -37,9 +37,9 @@ class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String,
 
   get("/keys/:id") {
     new AsyncResult {
+      val key = params("id")
       val is =
         Future {
-          val key = params("id")
           Try(cache.get(key)) match {
             case Success(value) =>
               logger.debug(s"key:value ${params("id")}:$value")
@@ -53,11 +53,15 @@ class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String,
   }
 
   put("/keys/:id") {
-    val key = params("id")
-    val pair: Pair = parsedBody.extract[Pair]
-    logger.error(s"Request body from curl: $pair")
-    redisClient.set(key, pair.value)
-    Ok(pair.copy(key = Some(key)))
+    new AsyncResult {
+      val key = params("id")
+      val pair: Pair = parsedBody.extract[Pair]
+      logger.debug(s"Request body from curl: $pair")
+      val is = Future {
+        redisClient.set(key, pair.value)
+        Ok(pair.copy(key = Some(key)))
+      }
+    }
   }
 }
 
