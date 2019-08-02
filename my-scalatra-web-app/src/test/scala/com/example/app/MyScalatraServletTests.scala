@@ -85,7 +85,7 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
     }
   }
 
-  test("LRU eviction") {
+  test("LRU eviction and fixed key size") {
     val validKey1 = "validKey1"
     val validValue1 = "validValue1"
     val validKey2 = "validKey2"
