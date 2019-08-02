@@ -14,6 +14,7 @@ class ScalatraBootstrap extends LifeCycle {
     val redisPort = conf.getInt("redisPort")
     val cacheExpiryTimeSeconds = conf.getLong("cacheExpiryTimeSeconds")
     val cacheCapacity = conf.getLong("cacheCapacity")
+    val maximumConcurrentConnections = conf.getInt("maximumConcurrentConnections")
 
     val r = new RedisClient(redisHost, redisPort)
     val cache = CacheBuilder.newBuilder()
@@ -28,7 +29,7 @@ class ScalatraBootstrap extends LifeCycle {
             }
           }
         })
-    val requestSemaphore = new Semaphore(10000)
+    val requestSemaphore = new Semaphore(maximumConcurrentConnections)
     context.mount(new MyScalatraServlet(new RedisClientAsGetAndSettable(r), cache, requestSemaphore), "/*")
   }
 }
