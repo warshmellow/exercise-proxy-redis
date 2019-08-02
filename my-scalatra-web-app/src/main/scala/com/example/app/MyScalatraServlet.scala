@@ -1,14 +1,11 @@
 package com.example.app
 
-import org.scalatra._
-
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration._
-import com.redis._
-import org.slf4j.LoggerFactory
 import com.example.app.MyScalatraServlet._
 import com.google.common.cache.LoadingCache
+import org.scalatra._
+import org.slf4j.LoggerFactory
 
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 // JSON-related libraries
@@ -17,8 +14,11 @@ import org.json4s.{DefaultFormats, Formats}
 // JSON handling support from Scalatra
 import org.scalatra.json._
 
-class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String, String]) extends ScalatraServlet with JacksonJsonSupport {
+class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String, String])
+  extends ScalatraServlet with JacksonJsonSupport with FutureSupport {
   protected implicit lazy val jsonFormats: Formats = DefaultFormats
+
+  protected implicit def executor: ExecutionContext = ExecutionContext.Implicits.global
 
   private val logger = LoggerFactory.getLogger(getClass)
 
@@ -27,15 +27,19 @@ class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String,
   }
 
   get("/keys/:id") {
-    val key = params("id")
-
-    Try(cache.get(key)) match {
-      case Success(value) =>
-        logger.error(s"key:value ${params("id")}:$value")
-        Ok(Pair(Some(key), value))
-      case Failure(exception) =>
-        logger.error(s"Cannot find $key", exception)
-        NotFound("")
+    new AsyncResult {
+      val is =
+        Future {
+          val key = params("id")
+          Try(cache.get(key)) match {
+            case Success(value) =>
+              logger.debug(s"key:value ${params("id")}:$value")
+              Ok(Pair(Some(key), value))
+            case Failure(exception) =>
+              logger.error(s"Cannot find $key", exception)
+              NotFound("")
+          }
+        }
     }
   }
 

@@ -22,7 +22,9 @@ libraryDependencies ++= Seq(
   "com.google.guava" % "guava-testlib" % "28.0-jre" % "test",
   "net.debasishg" %% "redisclient" % "3.10",
   "org.scalatra" %% "scalatra-json" % ScalatraVersion,
-  "org.json4s"   %% "json4s-jackson" % "3.5.2"
+  "org.json4s"   %% "json4s-jackson" % "3.5.2",
+  "com.typesafe.akka" %% "akka-actor" % "2.5.3",
+  "net.databinder.dispatch" %% "dispatch-core" % "0.13.1"
 )
 
 enablePlugins(SbtTwirl)
