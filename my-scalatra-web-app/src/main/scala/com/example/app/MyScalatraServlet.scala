@@ -1,5 +1,7 @@
 package com.example.app
 
+import java.util.concurrent.Semaphore
+
 import com.example.app.MyScalatraServlet._
 import com.google.common.cache.LoadingCache
 import org.scalatra._
@@ -14,7 +16,7 @@ import org.json4s.{DefaultFormats, Formats}
 // JSON handling support from Scalatra
 import org.scalatra.json._
 
-class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String, String])
+class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String, String], requestSemaphore: Semaphore)
   extends ScalatraServlet with JacksonJsonSupport with FutureSupport {
   protected implicit lazy val jsonFormats: Formats = DefaultFormats
 
@@ -24,6 +26,13 @@ class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String,
 
   before() {
     contentType = formats("json")
+    if (!requestSemaphore.tryAcquire()) {
+      halt(ServiceUnavailable(""))
+    }
+  }
+
+  after() {
+    requestSemaphore.release()
   }
 
   get("/keys/:id") {

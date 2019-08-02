@@ -1,4 +1,4 @@
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.{Semaphore, TimeUnit}
 
 import com.example.app._
 import com.google.common.cache.{CacheBuilder, CacheLoader}
@@ -21,7 +21,7 @@ class ScalatraBootstrap extends LifeCycle {
             }
           }
         })
-    
-    context.mount(new MyScalatraServlet(new RedisClientAsGetAndSettable(r), cache), "/*")
+    val requestSemaphore = new Semaphore(10000)
+    context.mount(new MyScalatraServlet(new RedisClientAsGetAndSettable(r), cache, requestSemaphore), "/*")
   }
 }

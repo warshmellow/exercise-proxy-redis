@@ -1,6 +1,6 @@
 package com.example.app
 
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.{Semaphore, TimeUnit}
 
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.redis.RedisClient
@@ -33,7 +33,10 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
           }
         }
       })
-  addServlet(new MyScalatraServlet(redisMock, cache), "/*")
+
+  val requestSemaphore = new Semaphore(100000)
+
+  addServlet(new MyScalatraServlet(redisMock, cache, requestSemaphore), "/*")
 
   test("GET /key/:id on MyScalatraServlet should cache return status 200 if key is found") {
     val validKey = "validKey"
