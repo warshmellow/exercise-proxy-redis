@@ -19,6 +19,7 @@ libraryDependencies ++= Seq(
   "org.eclipse.jetty" % "jetty-webapp" % "9.4.9.v20180320" % "container",
   "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
   "com.google.guava" % "guava" % "28.0-jre",
+  "com.google.guava" % "guava-testlib" % "28.0-jre" % "test",
   "net.debasishg" %% "redisclient" % "3.10",
   "org.scalatra" %% "scalatra-json" % ScalatraVersion,
   "org.json4s"   %% "json4s-jackson" % "3.5.2"

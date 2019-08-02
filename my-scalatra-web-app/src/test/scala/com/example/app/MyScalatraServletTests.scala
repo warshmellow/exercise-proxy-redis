@@ -7,6 +7,7 @@ import com.redis.RedisClient
 import org.scalamock.scalatest.MockFactory
 import org.scalatra.test.scalatest._
 import com.example.app.MyScalatraServlet._
+import com.google.common.testing.FakeTicker
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.{read, write}
@@ -16,9 +17,13 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
 
   val redisMock: GetAndSettable = mock[GetAndSettable]
 
+  val fakeTicker = new FakeTicker()
+  val expiry_seconds = 1000
+
   val cache: LoadingCache[String, String] = CacheBuilder.newBuilder()
     .maximumSize(1)
-    .expireAfterWrite(1000, TimeUnit.SECONDS)
+    .expireAfterWrite(expiry_seconds, TimeUnit.SECONDS)
+    .ticker(fakeTicker)
     .build[String, String](
       new CacheLoader[String, String]() {
         def load(key: String): String = {
@@ -105,5 +110,23 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
     }
 
     assertResult(null)(cache.getIfPresent(validKey1))
+  }
+
+  test("Global expiry works") {
+    val validKey = "validKey"
+    val validValue = "validValue"
+    (redisMock.set _).expects(*, *)
+    val json1 = write(Pair(None, validValue))
+
+    put(uri = s"/keys/$validKey", body = json1.getBytes()) {
+      assertResult(200)(status)
+      assertResult(Pair(Some(validKey), validValue))(parse(body).extract[Pair])
+    }
+
+    assertResult(validValue)(cache.getIfPresent(validKey))
+
+    fakeTicker.advance(expiry_seconds + 1000, TimeUnit.SECONDS)
+
+    assertResult(null)(cache.getIfPresent(validKey))
   }
 }
