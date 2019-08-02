@@ -41,4 +41,14 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
       }
     }
   }
+
+  test("GET /key/:id on MyScalatraServlet should return status 404 if key is not found") {
+    val invalidKey = "invalidKey"
+    (redisMock.get _).expects(invalidKey).returns(None)
+
+    get(s"/keys/$invalidKey") {
+      assertResult(404)(status)
+      assert(body.isBlank)
+    }
+  }
 }

@@ -35,7 +35,7 @@ class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String,
         Ok(Pair(Some(key), value))
       case Failure(exception) =>
         logger.error(s"Cannot find $key", exception)
-        NotFound(s"Cannot find $key")
+        NotFound("")
     }
   }
 
