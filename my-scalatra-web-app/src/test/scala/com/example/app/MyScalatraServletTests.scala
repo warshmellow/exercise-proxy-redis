@@ -64,4 +64,16 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
       assertResult(Pair(Some(validKey), validValue))(parse(body).extract[Pair])
     }
   }
+
+  test("PUT /key/:id on MyScalatraServlet should return status 200 and cast to string if value is not string") {
+    val validKey = "validKey"
+    val invalidValue = 500L
+    val json = s"""{"value":$invalidValue}"""
+    (redisMock.set _).expects(validKey, invalidValue.toString)
+
+    put(uri = s"/keys/$validKey", body = json.getBytes()) {
+      assertResult(200)(status)
+      assertResult(Pair(Some(validKey), invalidValue.toString))(parse(body).extract[Pair])
+    }
+  }
 }
