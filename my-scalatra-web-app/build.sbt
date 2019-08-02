@@ -1,4 +1,4 @@
-val ScalatraVersion = "2.7.0-RC1"
+val ScalatraVersion = "2.6.5"
 
 organization := "com.example"
 
