@@ -17,8 +17,8 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
   val redisMock: GetAndSettable = mock[GetAndSettable]
 
   val cache: LoadingCache[String, String] = CacheBuilder.newBuilder()
-    .maximumSize(1000)
-    .expireAfterWrite(1, TimeUnit.SECONDS)
+    .maximumSize(1)
+    .expireAfterWrite(1000, TimeUnit.SECONDS)
     .build[String, String](
       new CacheLoader[String, String]() {
         def load(key: String): String = {
@@ -30,10 +30,18 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
       })
   addServlet(new MyScalatraServlet(redisMock, cache), "/*")
 
-  test("GET /key/:id on MyScalatraServlet should return status 200 if key is found") {
+  test("GET /key/:id on MyScalatraServlet should cache return status 200 if key is found") {
     val validKey = "validKey"
     val validValue = "validValue"
-    (redisMock.get _).expects(validKey).returns(Some("validValue"))
+    // The noMoreThanOnce call ensures value is grabbed from cache the second time
+    (redisMock.get _).expects(validKey).returns(Some("validValue")).noMoreThanOnce()
+
+    get(s"/keys/$validKey") {
+      assertResult(200)(status)
+      assertResult(Pair(Some(validKey), validValue)) {
+        parse(body).extract[Pair]
+      }
+    }
 
     get(s"/keys/$validKey") {
       assertResult(200)(status)
