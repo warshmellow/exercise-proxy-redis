@@ -3,7 +3,6 @@ package com.example.app
 import java.util.concurrent.{Semaphore, TimeUnit}
 
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
-import com.redis.RedisClient
 import org.scalamock.scalatest.MockFactory
 import org.scalatra.test.scalatest._
 import com.example.app.MyScalatraServlet._
