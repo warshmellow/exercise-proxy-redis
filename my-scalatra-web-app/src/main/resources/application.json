@@ -1,8 +1,8 @@
 {
   "redisHost": "localhost",
-  "redisPort": 7777,
+  "redisPort": 6379,
   "cacheExpiryTimeSeconds": 1000,
   "cacheCapacity": 1000,
-  "httpPort": 8888,
+  "httpPort": 80,
   "maximumConcurrentConnections": 10000
 }
