@@ -111,14 +111,14 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
     }
   }
 
-  test("PUT /key/:id on MyScalatraServlet should return status 500 if set throws") {
+  test("PUT /key/:id on MyScalatraServlet should return status 503 if set throws") {
     val validKey = "validKey"
     val validValue = "validValue"
     (redisMock.set _).expects(validKey, validValue).throws(new Exception())
     val json = write(Pair(None, validValue))
 
     put(uri = s"/keys/$validKey", body = json.getBytes()) {
-      assertResult(500)(status)
+      assertResult(503)(status)
     }
   }
 

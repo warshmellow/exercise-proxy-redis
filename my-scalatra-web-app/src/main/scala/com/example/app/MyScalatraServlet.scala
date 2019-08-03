@@ -58,11 +58,16 @@ class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String,
       val pair: Pair = parsedBody.extract[Pair]
       logger.debug(s"Request body from curl: $pair")
       val is = Future {
-        val isSuccessful: Boolean = redisClient.set(key, pair.value)
-        if (isSuccessful) {
-          Ok(pair.copy(key = Some(key)))
-        } else {
-          BadRequest()
+        Try(redisClient.set(key, pair.value)) match {
+          case Success(isSuccessful) =>
+            if (isSuccessful) {
+              Ok(pair.copy(key = Some(key)))
+            } else {
+              BadRequest()
+            }
+          case Failure(exception) =>
+            logger.error(s"Failed to set $key $pair.value", exception)
+            ServiceUnavailable()
         }
       }
     }
