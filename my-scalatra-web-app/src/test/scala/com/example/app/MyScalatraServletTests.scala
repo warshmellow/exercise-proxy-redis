@@ -91,6 +91,17 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
     }
   }
 
+  test("PUT /key/:id on MyScalatraServlet should return status 400 if key cannot be set") {
+    val validKey = "validKey"
+    val validValue = "validValue"
+    (redisMock.set _).expects(validKey, validValue).returns(false)
+    val json = write(Pair(None, validValue))
+
+    put(uri = s"/keys/$validKey", body = json.getBytes()) {
+      assertResult(400)(status)
+    }
+  }
+
   test("LRU eviction and fixed key size") {
     val validKey1 = "validKey1"
     val validValue1 = "validValue1"
