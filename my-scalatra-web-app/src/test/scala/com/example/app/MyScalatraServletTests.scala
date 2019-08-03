@@ -67,6 +67,15 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
     }
   }
 
+  test("GET /key/:id on MyScalatraServlet should return status 404 if get throws") {
+    val invalidKey = "invalidKey"
+    (redisMock.get _).expects(invalidKey).throws(new Exception())
+
+    get(s"/keys/$invalidKey") {
+      assertResult(404)(status)
+    }
+  }
+
   test("PUT /key/:id on MyScalatraServlet should return status 200 if key is set") {
     val validKey = "validKey"
     val validValue = "validValue"
