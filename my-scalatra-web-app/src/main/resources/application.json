@@ -3,6 +3,6 @@
   "redisPort": 7777,
   "cacheExpiryTimeSeconds": 1000,
   "cacheCapacity": 1000,
-  "port": 8080,
+  "httpPort": 8080,
   "maximumConcurrentConnections": 10000
 }

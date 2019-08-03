@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
   "org.scalamock" %% "scalamock" % "4.3.0" % "test",
   "org.scalamock" %% "scalamock-scalatest-support" % "3.6.0" % "test",
   "ch.qos.logback" % "logback-classic" % "1.2.3" % "runtime",
-  "org.eclipse.jetty" % "jetty-webapp" % "9.4.9.v20180320" % "container",
+  "org.eclipse.jetty" % "jetty-webapp" % "9.4.9.v20180320" % "container;compile",
   "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
   "com.google.guava" % "guava" % "28.0-jre",
   "com.google.guava" % "guava-testlib" % "28.0-jre" % "test",
@@ -27,6 +27,11 @@ libraryDependencies ++= Seq(
   "net.databinder.dispatch" %% "dispatch-core" % "0.13.1",
   "com.typesafe" % "config" % "1.3.4"
 )
+
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case x => MergeStrategy.first
+}
 
 enablePlugins(SbtTwirl)
 enablePlugins(ScalatraPlugin)
