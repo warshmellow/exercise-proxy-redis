@@ -17,19 +17,20 @@ class ScalatraBootstrap extends LifeCycle {
     val maximumConcurrentConnections = conf.getInt("maximumConcurrentConnections")
 
     val r = new RedisClient(redisHost, redisPort)
+    val t = new RedisClientAsGetAndSettable(r)
     val cache = CacheBuilder.newBuilder()
       .maximumSize(cacheCapacity)
       .expireAfterWrite(cacheExpiryTimeSeconds, TimeUnit.SECONDS)
       .build[String, String](
         new CacheLoader[String, String]() {
           def load(key: String): String = {
-            r.get(key) match {
+            t.get(key) match {
               case Some(value) => value
               case None => throw new Exception(s"Cannot find $key")
             }
           }
         })
     val requestSemaphore = new Semaphore(maximumConcurrentConnections)
-    context.mount(new MyScalatraServlet(new RedisClientAsGetAndSettable(r), cache, requestSemaphore), "/*")
+    context.mount(new MyScalatraServlet(t, cache, requestSemaphore), "/*")
   }
 }
