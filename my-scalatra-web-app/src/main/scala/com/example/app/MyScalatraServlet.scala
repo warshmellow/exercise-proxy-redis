@@ -46,7 +46,7 @@ class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String,
               Ok(Pair(Some(key), value))
             case Failure(exception) =>
               logger.error(s"Cannot find $key", exception)
-              NotFound("")
+              NotFound()
           }
         }
     }
@@ -58,8 +58,12 @@ class MyScalatraServlet(redisClient: GetAndSettable, cache: LoadingCache[String,
       val pair: Pair = parsedBody.extract[Pair]
       logger.debug(s"Request body from curl: $pair")
       val is = Future {
-        redisClient.set(key, pair.value)
-        Ok(pair.copy(key = Some(key)))
+        val isSuccessful: Boolean = redisClient.set(key, pair.value)
+        if (isSuccessful) {
+          Ok(pair.copy(key = Some(key)))
+        } else {
+          BadRequest()
+        }
       }
     }
   }

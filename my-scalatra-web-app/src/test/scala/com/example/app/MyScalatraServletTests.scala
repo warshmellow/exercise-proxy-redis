@@ -64,14 +64,13 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
 
     get(s"/keys/$invalidKey") {
       assertResult(404)(status)
-      assert(body.isBlank)
     }
   }
 
   test("PUT /key/:id on MyScalatraServlet should return status 200 if key is set") {
     val validKey = "validKey"
     val validValue = "validValue"
-    (redisMock.set _).expects(validKey, validValue)
+    (redisMock.set _).expects(validKey, validValue).returns(true)
     val json = write(Pair(None, validValue))
 
     put(uri = s"/keys/$validKey", body = json.getBytes()) {
@@ -84,7 +83,7 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
     val validKey = "validKey"
     val invalidValue = 500L
     val json = s"""{"value":$invalidValue}"""
-    (redisMock.set _).expects(validKey, invalidValue.toString)
+    (redisMock.set _).expects(validKey, invalidValue.toString).returns(true)
 
     put(uri = s"/keys/$validKey", body = json.getBytes()) {
       assertResult(200)(status)
@@ -97,7 +96,7 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
     val validValue1 = "validValue1"
     val validKey2 = "validKey2"
     val validValue2 = "validValue2"
-    (redisMock.set _).expects(*, *).repeat(2)
+    (redisMock.set _).expects(*, *).returns(true).repeat(2)
     val json1 = write(Pair(None, validValue1))
     val json2 = write(Pair(None, validValue2))
 
@@ -117,7 +116,7 @@ class MyScalatraServletTests extends ScalatraFunSuite with MockFactory {
   test("Global expiry works") {
     val validKey = "validKey"
     val validValue = "validValue"
-    (redisMock.set _).expects(*, *)
+    (redisMock.set _).expects(*, *).returns(true)
     val json1 = write(Pair(None, validValue))
 
     put(uri = s"/keys/$validKey", body = json1.getBytes()) {
