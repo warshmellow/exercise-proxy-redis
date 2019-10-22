@@ -1,4 +1,4 @@
-# Proxy for Redis
+# Proxy for Redis (Proof of Concept)
 We build a proxy for redis using `Scala`, a web microframework called `Scalatra`, and `Docker`. We have tests in Scalatest and support Parallel Concurrency using Scala `Future`s, and a concurrent request cap using a Java `Semaphore`. We also support caching (Global expiry, LRU, fixed key size) using `Google Guava Cache`, a battle tested implementation backed by a Java `HashMap`.
 
 For simplicity we only work with the Redis Commands `GET` and `SET`, which deals only with string keys and values. A further enhancement would allow arbitrary data structures as values and access of those values.
